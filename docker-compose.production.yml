@@ -1,0 +1,49 @@
+##
+# This docker-compose file extends the default docker-compose.yml with
+# **production** settings.
+#
+version: '2'
+services:
+  contract_observer:
+    restart: on-failure
+    volumes:
+      - ./alembic.ini:/usr/src/app/alembic.ini
+      - .:/usr/src/app
+
+  etherdelta_observer:
+    restart: on-failure
+    volumes:
+      - .:/usr/src/app
+
+  huey_consumer:
+    restart: on-failure
+    volumes:
+      - .:/usr/src/app
+
+  ticker:
+    restart: on-failure
+    volumes:
+      - .:/usr/src/app
+
+  websocket_server:
+    ports:
+      - "8080:8080"
+    restart: on-failure
+    volumes:
+      - .:/usr/src/app
+
+  postgres:
+    volumes:
+      - ./postgres-data/:/var/lib/postgresql/data
+
+  nginx:
+    image: yfix/nginx
+    ports:
+      - "443:443"
+    restart: unless-stopped
+    volumes:
+      - ./docker/etc/nginx:/etc/nginx
+      - ./docker/var/log/nginx:/var/log/nginx
+      - ./docker/var/log/supervisor:/var/log/supervisor
+#      - ./docker/etc/supervisor/conf.d/nginx.conf:/etc/supervisor/conf.d/nginx.conf
+#      - ./docker/var/cache/nginx:/var/cache/nginx
